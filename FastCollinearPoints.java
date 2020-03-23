@@ -4,36 +4,55 @@
  *  Description:
  **************************************************************************** */
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class FastCollinearPoints {
 
     private Deque<LineSegment> segments;
 
     // finds all line segments containing 4 or more points
-    public FastCollinearPoints(Point[] points) {
-        if (points == null) {
+    public FastCollinearPoints(Point[] inPoints) {
+        if (inPoints == null) {
             throw new IllegalArgumentException("FastCollinearPoints with null points array");
         }
+        Point[] points = Arrays.copyOf(inPoints, inPoints.length);
         segments = new Deque<>();
-        for (int i1 = 0; i1 < points.length; ++i1) {
-            Point p1 = points[i1];
+        for (int i1 = 0; i1 < inPoints.length; ++i1) {
+            Point p1 = inPoints[i1];
             if (p1 == null) {
                 throw new IllegalArgumentException("FastCollinearPoints with null point in array");
             }
-            double[] slopes = new double[points.length - 1];
-            int slopesIndex = 0;
-            for (int i2 = 0; i2 < points.length; ++i2) {
-                Point p2 = points[i2];
-                if (i2 == i1) {
-                    continue;
+            Arrays.sort(points,
+                        (pComp1, pComp2) -> (int) (p1.slopeTo(pComp1) - p1.slopeTo(pComp2)));
+            boolean findP1 = false;
+            for (int i2 = 0; i2 < points.length - 3; ++i2) {
+                if (p1.compareTo(points[i2]) == 0) {
+                    if (findP1) {
+                        throw new IllegalArgumentException("duplicate point " + p1);
+                    }
+                    findP1 = true;
                 }
-                if (p2.compareTo(p1) == 0) {
-                    throw new IllegalArgumentException("FastCollinearPoints with duplicate points");
+                List<Point> pointsToSort = new ArrayList<>(4);
+                double slopeI2 = p1.slopeTo(points[i2]);
+                for (int step = 1; step < points.length - i2 - 1; ++step) {
+                    if (p1.slopeTo(points[i2 + step]) == slopeI2) {
+                        pointsToSort.add(points[i2 + step]);
+                    }
+                    else {
+                        break;
+                    }
                 }
-                slopes[slopesIndex++] = p1.slopeTo(p2);
+                if (pointsToSort.size() > 2) {
+                    pointsToSort.add(p1);
+                    Collections.sort(pointsToSort);
+                    segments.addLast(new LineSegment(pointsToSort.get(0),
+                                                     pointsToSort.get(pointsToSort.size() - 1)));
+                    i2 = i2 + pointsToSort.size() - 1;
+                }
             }
-            Arrays.sort(slopes);
         }
     }
 
