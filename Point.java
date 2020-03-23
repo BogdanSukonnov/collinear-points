@@ -60,7 +60,7 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        /* YOUR CODE HERE */
+        return (that.y - this.y) / (double) (that.x - this.x);
     }
 
     /**
@@ -79,6 +79,12 @@ public class Point implements Comparable<Point> {
         if (this.y < that.y || this.y == that.y && this.x < that.x) {
             return -1;
         }
+        else if (this.y == that.y && this.x == that.x) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
     }
 
     /**
@@ -88,7 +94,7 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        /* YOUR CODE HERE */
+        return new SlopeComparator();
     }
 
 
@@ -109,5 +115,11 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
+    }
+
+    private class SlopeComparator implements Comparator<Point> {
+        public int compare(Point point, Point t1) {
+            return (int) (slopeTo(point) - slopeTo(t1));
+        }
     }
 }
