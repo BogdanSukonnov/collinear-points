@@ -4,6 +4,10 @@
  *  Description:
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,43 +18,55 @@ public class FastCollinearPoints {
     private Deque<LineSegment> segments;
 
     // finds all line segments containing 4 or more points
-    public FastCollinearPoints(Point[] inPoints) {
-        if (inPoints == null) {
-            throw new IllegalArgumentException("FastCollinearPoints with null points array");
+    public FastCollinearPoints(Point[] points) {
+        if (points == null) {
+            throw new IllegalArgumentException("FastCollinearPoints with null pointsToCheck array");
         }
-        Point[] points = Arrays.copyOf(inPoints, inPoints.length);
+        Deque<Point> usedPoints = new Deque<>();
+        Point[] pointsToCheck = Arrays.copyOf(points, points.length);
         segments = new Deque<>();
-        for (int i1 = 0; i1 < inPoints.length; ++i1) {
-            Point p1 = inPoints[i1];
-            if (p1 == null) {
+        for (int iBase = 0; iBase < points.length; ++iBase) {
+            Point pBase = points[iBase];
+            if (pBase == null) {
                 throw new IllegalArgumentException("FastCollinearPoints with null point in array");
             }
-            Arrays.sort(points,
-                        (pComp1, pComp2) -> (int) (p1.slopeTo(pComp1) - p1.slopeTo(pComp2)));
-            boolean findP1 = false;
-            for (int i2 = 0; i2 < points.length - 3; ++i2) {
-                if (p1.compareTo(points[i2]) == 0) {
-                    if (findP1) {
-                        throw new IllegalArgumentException("duplicate point " + p1);
+            if (isPointUsed(pBase, usedPoints)) {
+                continue;
+            }
+            Arrays.sort(pointsToCheck, pBase.slopeOrder());
+            boolean isBaseFoundAlready = false;
+            // points to check is sorted by slope with the base point so collinear will be together
+            // we are interested at at least 4 colinear points
+            for (int iCandidate = 0; iCandidate < pointsToCheck.length - 3; ++iCandidate) {
+                if (pBase.compareTo(pointsToCheck[iCandidate]) == 0) {
+                    if (isBaseFoundAlready) {
+                        throw new IllegalArgumentException(
+                                "FastCollinearPoints with duplicate point " + pBase);
                     }
-                    findP1 = true;
+                    isBaseFoundAlready = true;
+                    continue;
                 }
-                List<Point> pointsToSort = new ArrayList<>(4);
-                double slopeI2 = p1.slopeTo(points[i2]);
-                for (int step = 1; step < points.length - i2 - 1; ++step) {
-                    if (p1.slopeTo(points[i2 + step]) == slopeI2) {
-                        pointsToSort.add(points[i2 + step]);
+                List<Point> collinearPointsNextToCandidate = new ArrayList<>();
+                double slopeCandidate = pBase.slopeTo(pointsToCheck[iCandidate]);
+                for (int step = 1; step < pointsToCheck.length - iCandidate - 1; ++step) {
+                    if (pBase.slopeTo(pointsToCheck[iCandidate + step]) == slopeCandidate) {
+                        collinearPointsNextToCandidate.add(pointsToCheck[iCandidate + step]);
                     }
                     else {
                         break;
                     }
                 }
-                if (pointsToSort.size() > 2) {
-                    pointsToSort.add(p1);
-                    Collections.sort(pointsToSort);
-                    segments.addLast(new LineSegment(pointsToSort.get(0),
-                                                     pointsToSort.get(pointsToSort.size() - 1)));
-                    i2 = i2 + pointsToSort.size() - 1;
+                if (collinearPointsNextToCandidate.size() > 1) {
+                    collinearPointsNextToCandidate.add(pBase);
+                    collinearPointsNextToCandidate.add(pointsToCheck[iCandidate]);
+                    Collections.sort(collinearPointsNextToCandidate);
+                    segments.addLast(new LineSegment(collinearPointsNextToCandidate.get(0),
+                                                     collinearPointsNextToCandidate
+                                                             .get(collinearPointsNextToCandidate
+                                                                          .size() - 1)));
+                    for (Point pointOfSegment : collinearPointsNextToCandidate) {
+                        usedPoints.addLast(pointOfSegment);
+                    }
                 }
             }
         }
@@ -70,5 +86,47 @@ public class FastCollinearPoints {
             ++i;
         }
         return segmentsArray;
+    }
+
+    public static void main(String[] args) {
+
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
+    }
+
+    private boolean isPointUsed(Point point, Deque<Point> usedPoints) {
+        if (point == null || usedPoints == null || usedPoints.size() == 0) {
+            return false;
+        }
+        for (Point usedPoint : usedPoints) {
+            if (point.compareTo(usedPoint) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

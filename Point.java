@@ -118,8 +118,8 @@ public class Point implements Comparable<Point> {
     }
 
     private class SlopeComparator implements Comparator<Point> {
-        public int compare(Point point, Point t1) {
-            return (int) (slopeTo(point) - slopeTo(t1));
+        public int compare(Point point1, Point point2) {
+            return Double.compare(slopeTo(point1), slopeTo(point2));
         }
     }
 }
