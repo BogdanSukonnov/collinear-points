@@ -72,20 +72,16 @@ public class FastCollinearPoints {
         }
     }
 
-    // the number of line segments
-    public int numberOfSegments() {
-        return segments.size();
-    }
-
-    // the line segments
-    public LineSegment[] segments() {
-        LineSegment[] segmentsArray = new LineSegment[segments.size()];
-        int i = 0;
-        for (LineSegment segment : segments) {
-            segmentsArray[i] = segment;
-            ++i;
+    private boolean isPointUsed(Point point, Deque<Point> usedPoints) {
+        if (point == null || usedPoints == null || usedPoints.size() == 0) {
+            return false;
         }
-        return segmentsArray;
+        for (Point usedPoint : usedPoints) {
+            if (point.compareTo(usedPoint) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
@@ -118,15 +114,19 @@ public class FastCollinearPoints {
         StdDraw.show();
     }
 
-    private boolean isPointUsed(Point point, Deque<Point> usedPoints) {
-        if (point == null || usedPoints == null || usedPoints.size() == 0) {
-            return false;
+    // the line segments
+    public LineSegment[] segments() {
+        LineSegment[] segmentsArray = new LineSegment[segments.size()];
+        int i = 0;
+        for (LineSegment segment : segments) {
+            segmentsArray[i] = segment;
+            ++i;
         }
-        for (Point usedPoint : usedPoints) {
-            if (point.compareTo(usedPoint) == 0) {
-                return true;
-            }
-        }
-        return false;
+        return segmentsArray;
+    }
+
+    // the number of line segments
+    public int numberOfSegments() {
+        return segments.size();
     }
 }

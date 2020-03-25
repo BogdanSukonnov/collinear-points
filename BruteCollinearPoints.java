@@ -54,22 +54,6 @@ public class BruteCollinearPoints {
         }
     }
 
-    // the number of line segments
-    public int numberOfSegments() {
-        return segments.size();
-    }
-
-    // the line segments
-    public LineSegment[] segments() {
-        LineSegment[] segmentsArray = new LineSegment[segments.size()];
-        int i = 0;
-        for (LineSegment segment : segments) {
-            segmentsArray[i] = segment;
-            ++i;
-        }
-        return segmentsArray;
-    }
-
     public static void main(String[] args) {
 
         // read the n points from a file
@@ -98,5 +82,21 @@ public class BruteCollinearPoints {
             segment.draw();
         }
         StdDraw.show();
+    }
+
+    // the line segments
+    public LineSegment[] segments() {
+        LineSegment[] segmentsArray = new LineSegment[segments.size()];
+        int i = 0;
+        for (LineSegment segment : segments) {
+            segmentsArray[i] = segment;
+            ++i;
+        }
+        return segmentsArray;
+    }
+
+    // the number of line segments
+    public int numberOfSegments() {
+        return segments.size();
     }
 }
