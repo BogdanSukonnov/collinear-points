@@ -14,7 +14,7 @@ import java.util.List;
 
 public class BruteCollinearPoints {
 
-    private Deque<LineSegment> segments;
+    private final Deque<LineSegment> segments;
 
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {

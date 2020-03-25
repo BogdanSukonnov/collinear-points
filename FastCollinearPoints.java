@@ -15,7 +15,7 @@ import java.util.List;
 
 public class FastCollinearPoints {
 
-    private Deque<LineSegment> segments;
+    private final Deque<LineSegment> segments;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
