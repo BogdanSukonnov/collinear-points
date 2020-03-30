@@ -9,6 +9,7 @@
  ******************************************************************************/
 
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Comparator;
 
@@ -60,6 +61,15 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
+        if (that.x == this.x) {
+            if (that.y == this.y) {
+                return Double.NEGATIVE_INFINITY;
+            }
+            return Double.POSITIVE_INFINITY;
+        }
+        if (that.y == this.y) {
+            return 0.0;
+        }
         return (that.y - this.y) / (double) (that.x - this.x);
     }
 
@@ -114,7 +124,23 @@ public class Point implements Comparable<Point> {
      * Unit tests the Point data type.
      */
     public static void main(String[] args) {
-        /* YOUR CODE HERE */
+
+        double slopeHorizontal = new Point(1, 1).slopeTo(new Point(2, 1));
+        String resultHorizontal = slopeHorizontal == 0.0 ? "Pass" : "Fail";
+        StdOut.printf("%s horizontal test = %s\n", resultHorizontal, slopeHorizontal);
+
+        double slopeVertical = new Point(1, 1).slopeTo(new Point(1, 2));
+        String resultVertical = slopeVertical == Double.POSITIVE_INFINITY ?
+                                "Pass" : "Fail";
+        StdOut.printf("%s vertical test = %s\n", resultVertical, slopeVertical);
+
+        double slopeSame = new Point(1, 1).slopeTo(new Point(1, 1));
+        String resultSame = slopeSame == Double.NEGATIVE_INFINITY ?
+                            "Pass" : "Fail";
+        StdOut.printf("%s same test = %s\n", resultSame, slopeSame);
+
+        StdOut.printf("(3299, 24684).slopeTo(3299, 17883) = %s",
+                      new Point(3299, 24684).slopeTo(new Point(3299, 17883)));
     }
 
     private class SlopeComparator implements Comparator<Point> {

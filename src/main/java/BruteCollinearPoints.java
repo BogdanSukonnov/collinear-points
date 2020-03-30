@@ -5,6 +5,7 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -14,14 +15,14 @@ import java.util.List;
 
 public class BruteCollinearPoints {
 
-    private final Deque<LineSegment> segments;
+    private final Stack<LineSegment> segments = new Stack<>();
 
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
         if (points == null) {
             throw new IllegalArgumentException("BruteCollinearPoints with null points array");
         }
-        segments = new Deque<>();
+
         for (int i1 = 0; i1 < points.length; ++i1) {
             if (points[i1] == null) {
                 throw new IllegalArgumentException("BruteCollinearPoints with null point in array");
@@ -46,7 +47,7 @@ public class BruteCollinearPoints {
                             List<Point> linePoints = Arrays.asList(p1, p2, p3, p4);
                             Point minPoint = Collections.min(linePoints, p1.slopeOrder());
                             Point maxPoint = Collections.max(linePoints, p1.slopeOrder());
-                            segments.addLast(new LineSegment(minPoint, maxPoint));
+                            pushIfNotThere(new LineSegment(minPoint, maxPoint));
                         }
                     }
                 }
@@ -98,5 +99,14 @@ public class BruteCollinearPoints {
     // the number of line segments
     public int numberOfSegments() {
         return segments.size();
+    }
+
+    private void pushIfNotThere(LineSegment lineSegment) {
+        for (LineSegment pushedSegment : segments) {
+            if (pushedSegment.toString().equals(lineSegment.toString())) {
+                return;
+            }
+        }
+        segments.push(lineSegment);
     }
 }

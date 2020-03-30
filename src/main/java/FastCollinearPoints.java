@@ -5,6 +5,7 @@
  **************************************************************************** */
 
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -15,23 +16,18 @@ import java.util.List;
 
 public class FastCollinearPoints {
 
-    private final Deque<LineSegment> segments;
+    private final Stack<LineSegment> segments = new Stack<>();
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
         if (points == null) {
             throw new IllegalArgumentException("FastCollinearPoints with null pointsToCheck array");
         }
-        Deque<Point> usedPoints = new Deque<>();
         Point[] pointsToCheck = Arrays.copyOf(points, points.length);
-        segments = new Deque<>();
         for (int iBase = 0; iBase < points.length; ++iBase) {
             Point pBase = points[iBase];
             if (pBase == null) {
                 throw new IllegalArgumentException("FastCollinearPoints with null point in array");
-            }
-            if (isPointUsed(pBase, usedPoints)) {
-                continue;
             }
             Arrays.sort(pointsToCheck, pBase.slopeOrder());
             boolean isBaseFoundAlready = false;
@@ -60,19 +56,16 @@ public class FastCollinearPoints {
                     collinearPointsNextToCandidate.add(pBase);
                     collinearPointsNextToCandidate.add(pointsToCheck[iCandidate]);
                     Collections.sort(collinearPointsNextToCandidate);
-                    segments.addLast(new LineSegment(collinearPointsNextToCandidate.get(0),
-                                                     collinearPointsNextToCandidate
-                                                             .get(collinearPointsNextToCandidate
-                                                                          .size() - 1)));
-                    for (Point pointOfSegment : collinearPointsNextToCandidate) {
-                        usedPoints.addLast(pointOfSegment);
-                    }
+                    pushIfNotThere(new LineSegment(collinearPointsNextToCandidate.get(0),
+                                                   collinearPointsNextToCandidate
+                                                           .get(collinearPointsNextToCandidate
+                                                                        .size() - 1)));
                 }
             }
         }
     }
 
-    private boolean isPointUsed(Point point, Deque<Point> usedPoints) {
+    private boolean isPointUsed(Point point, Stack<Point> usedPoints) {
         if (point == null || usedPoints == null || usedPoints.size() == 0) {
             return false;
         }
@@ -128,5 +121,14 @@ public class FastCollinearPoints {
     // the number of line segments
     public int numberOfSegments() {
         return segments.size();
+    }
+
+    private void pushIfNotThere(LineSegment lineSegment) {
+        for (LineSegment pushedSegment : segments) {
+            if (pushedSegment.toString().equals(lineSegment.toString())) {
+                return;
+            }
+        }
+        segments.push(lineSegment);
     }
 }
